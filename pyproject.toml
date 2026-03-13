@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "synchroteam_api"
+version = "0.1.0"
+description = "Python client for Synchroteam API"
+authors = [
+    { name = "Michel Muñoz", email = "michelmzco@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "requests",
+    "pandas",
+    "tqdm",
+]
+
+[tool.setuptools.packages.find]
+where = ["app"]
+include = ["synchroteam_api"]
