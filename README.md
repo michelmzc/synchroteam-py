@@ -15,3 +15,16 @@ Synchroteam user, password and web_url are used for download Jobs PDFs and are o
 
 
 ## Example of use
+
+```
+# First configure you enviroment variables or .env file and activate
+
+from synchroteam_py import SynchroteamClient
+
+client = SynchroteamClient()
+
+jobs_types = client.jobs.get_job_types()
+
+print(jobs_types)
+
+```
