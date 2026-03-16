@@ -13,12 +13,12 @@ class CustomersAPI:
                      customer_num: Optional[str]=None
                      ):
         """
-            Busca un cliente por ID interno de Synchro (customer_id) o por ID externo (customer_myId).
-            Debe enviarse al menos uno de los dos parámetros.
-            Obtener un cliente por:
-                id: Identificador interno de Synchroteam
-                myId: Identificador personalizado
-                num: Número de Synchroteam
+            Get a client by Synchroteam id, myId or num.
+            Must be one parameters.
+            Get by:
+                id: internal synchroteam id
+                myId: custom id
+                num: synchroteam number
 
         """
 
