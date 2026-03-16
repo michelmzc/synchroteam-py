@@ -15,7 +15,7 @@ from .reports.reports_api import ReportAPI
 from ._filters import check_status_job, get_jobs_by_last_hour_modified, target_photo_filter
 from ._downloads import download_job_photos, download_single_photo, download_job_pdf, download_jobs_pdfs
 from ._exports import suberegisters_to_csv
-from ..utils import get_all_records
+from ...utils import get_all_records
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 

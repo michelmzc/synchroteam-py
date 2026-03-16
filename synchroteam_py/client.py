@@ -8,11 +8,11 @@ from .config import DOMAIN, API_URL, API_KEY, USER, PASSWORD, WEB_URL
 from typing import Dict, Optional, Any
 from .utils import get_all_records, parse_utc
 from pathlib import Path
-from .jobs.jobs_api import JobsAPI
-from .jobs.reports.reports_api import ReportAPI
-from .users import UsersAPI
-from .equipment import EquipmentAPI
-from .customers.customers_api import CustomersAPI
+from .endpoints.jobs.jobs_api import JobsAPI
+from .endpoints.jobs.reports.reports_api import ReportAPI
+from .endpoints.users import UsersAPI
+from .endpoints.equipment import EquipmentAPI
+from .endpoints.customers_api import CustomersAPI
 
 class SynchroteamClient:
     def __init__(self):

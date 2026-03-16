@@ -1,5 +1,5 @@
 from typing import Optional
-from .utils import get_all_records
+from ..utils import get_all_records
 
 class UsersAPI:
     def __init__(self, client: "SynchroteamClient"): # type: ignore

@@ -1,4 +1,6 @@
-
+"""
+Config file for wrapper
+"""
 import os
 from dotenv import load_dotenv 
 

@@ -2,7 +2,7 @@
 
 This proyect is a wrapper for Synchroteam API.
 
-## Enviroment varibales
+## Enviroment variables
 ```
 SYNCHROTEAM_DOMAIN=
 SYNCHROTEAM_API_KEY=
@@ -12,3 +12,6 @@ SYNCHROTEAM_WEB_URL=
 ```
 
 Synchroteam user, password and web_url are used for download Jobs PDFs and are optional.
+
+
+## Example of use

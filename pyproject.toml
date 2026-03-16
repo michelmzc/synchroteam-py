@@ -1,16 +1,15 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "synchroteam_api"
+name = "synchroteam_py"
 version = "0.1.0"
-description = "Python client for Synchroteam API"
+description = "Python wrapper for Synchroteam API."
 authors = [
     { name = "Michel Muñoz", email = "michelmzco@gmail.com" }
 ]
 readme = "README.md"
-requires-python = ">=3.9"
 dependencies = [
     "requests",
     "pandas",
@@ -18,5 +17,5 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-where = ["app"]
-include = ["synchroteam_api"]
+where = ["."]
+include = ["synchroteam_py"]

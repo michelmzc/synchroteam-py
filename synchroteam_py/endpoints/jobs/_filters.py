@@ -4,7 +4,7 @@ Estos procesan los datos entregados por la API en tiempo de ejecución.
 """
 
 from datetime import datetime, timezone, timedelta
-from ..utils import parse_utc
+from ...utils import parse_utc
 
 from typing import List
 
