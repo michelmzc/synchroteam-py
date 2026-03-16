@@ -2,7 +2,7 @@
 
 This proyect is a wrapper for Synchroteam API.
 
-## Enviroment variables
+## Enviroment variables and optional .env file
 ```
 SYNCHROTEAM_DOMAIN=
 SYNCHROTEAM_API_KEY=
