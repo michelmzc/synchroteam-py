@@ -1,6 +1,6 @@
 # Synchroteam API python wrapper
 
-This proyect is a wrapper for Synchroteam API.
+This proyect is a wrapper for Synchroteam API V3.
 ## Setup
 
 Clone the repository and then:
