@@ -45,9 +45,7 @@ class JobsAPI:
     
 
     def get_all_jobs(self, extra_params: Optional[Dict]) -> List[Dict]:
-        """ Get jobs based on custom parameters using multithreading """
-        print(f"{self.client.base_url}/job/list")
-        
+        """ Get jobs based on custom parameters using multithreading """       
         return self.client.get_all_records(
             url = f"{self.client.base_url}/job/list",
             headers = self.client.headers,
