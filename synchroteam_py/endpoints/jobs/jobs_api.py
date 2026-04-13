@@ -20,6 +20,8 @@ class JobsAPI:
         """
         Check status jobs and returns as requested.
         Statuses: created, scheduled, synchronized, started, paused, completed, validated or cancelled        
+
+        This function is a filter used when the status parameter included in get Jobs request doesn't work.
         """
         checked_jobs = []
         for job in job_list:
@@ -44,6 +46,8 @@ class JobsAPI:
 
     def get_all_jobs(self, extra_params: Optional[Dict]) -> List[Dict]:
         """ Get jobs based on custom parameters using multithreading """
+        print(f"{self.client.base_url}/job/list")
+        
         return self.client.get_all_records(
             url = f"{self.client.base_url}/job/list",
             headers = self.client.headers,

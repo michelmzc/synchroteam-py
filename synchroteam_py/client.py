@@ -9,6 +9,7 @@ from typing import Dict, Optional, Any
 from pathlib import Path
 from math import ceil
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from tqdm import tqdm
 from typing import Optional, Dict, List
 from datetime import timezone
 from dateutil.parser import parse 
@@ -100,7 +101,7 @@ class SynchroteamClient:
         
         return response.json()
     # función para obtener todos los registros de una consulta desde su paginación
-    def get_all_records(
+    def get_all_records(self, 
             url: str, 
             headers: Optional[Dict[str, str]], 
             extra_params: Optional[Dict] = None, 
