@@ -86,29 +86,41 @@ class JobsAPI:
         return jobs  
 
 
-    def target_photo_filter(self, photos, target_photo):
+    def target_photo_filter(self, photos: Dict, target_photo: List):
         """ Get a photo by a filter they custom name"""
-        for photo in photos["jobPhoto"]:
-            if photo["comment"] == target_photo:
-                return photo
-        return None
+        targeted_photos = []
 
-    def get_photos(self, job_id: str = "", target_photo: str = "") -> Any:
+        for photo in photos["jobPhoto"]:
+            if photo["comment"] in target_photo:
+                targeted_photos.append(photo)
+        
+        if len(targeted_photos) <= 0:
+            return None
+        
+        return targeted_photos
+        
+
+    def get_photos(self, job_id: str = "", num: str="", target_photos: List[str] = []) -> Any:
         """ Get photos from a job by id """
         endpoint = f"/job/photos"        
-        params = {"id":job_id}
+        if job_id:
+            params = {"id":job_id}
+        elif num:
+            params = {"num":num}
+        else:
+            return "Must provide Job ID or num"
         photos = self.client._request("GET", endpoint, params=params)
 
-        if target_photo:
-            photos = self.target_photo_filter(photos, target_photo)
+        if target_photos:
+            photos = self.target_photo_filter(photos, target_photos)
             if photos: return photos
             else: return "Photo not found"
         return photos
     
     
-    def download_single_photo(self, photo, folder):
+    def download_single_photo(self, photo, folder, name):
         """ Download a single photo by photo id and folder destination """
-        return download_single_photo(photo, folder)
+        return download_single_photo(photo, folder, name)
 
     def download_job_photos(self, job_id, service_id, folder):
         """ Download job photos by job_id, myId and folder """

@@ -53,13 +53,15 @@ def renumerar_imagenes_por_indice(folder: Path):
         if original != destino:
             shutil.move(str(original), destino)
 
-def download_single_photo(photo, folder) -> bool:
+def download_single_photo(photo: Dict, folder: str, name: str) -> bool:
     """ Descarga una foto individual """
 
     url = photo.get("url")
     comment = photo.get("comment", "").strip()
 
-    if comment:
+    if name:
+        filename = str(name) + ".jpg"
+    elif comment:
         filename = comment + ".jpg"
     else:
         filename = ".jpg"   # queda como archivo sin nombre → se renumera después
@@ -92,16 +94,12 @@ def download_job_photos(
     job_folder = Path(folder)
     job_folder.mkdir(parents=True, exist_ok=True)
 
-    # ======================================================
-    # ⛔ SI YA EXISTEN IMÁGENES → NO HACER NADA
-    # ======================================================
+    # Si ya existen imágenes no hacer nada, mejorable a comprobar imagenes cargadas
     if imagenes_ya_descargadas(job_folder):
         print(f"⏭️ Fotos ya descargadas para {service_id}, se omite descarga")
         return str(job_folder)
 
-    # ======================================================
-    # DESCARGA
-    # ======================================================
+    # Descarga
     with ThreadPoolExecutor(max_workers=5) as executor:
         if target:
             futures = [
@@ -117,9 +115,7 @@ def download_job_photos(
         for f in futures:
             f.result()
 
-    # ======================================================
-    # 🔢 RENÚMERAR SOLO SI SE DESCARGÓ
-    # ======================================================
+    
     renumerar_imagenes_por_indice(job_folder)
 
     return str(job_folder)
