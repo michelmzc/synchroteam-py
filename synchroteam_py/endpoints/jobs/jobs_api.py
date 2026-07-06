@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional, List
 from datetime import datetime, timezone, timedelta
 
 from .reports.reports_api import ReportAPI
-from ._downloads import download_job_photos, download_single_photo, download_job_pdf, download_jobs_pdfs
+from ._downloads import download_job_photos, download_single_photo
 
     
 class JobsAPI:
