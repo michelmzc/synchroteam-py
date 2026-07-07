@@ -1,20 +1,18 @@
 """
-Usa client.py para obtener Trabajos, aplicar filtros, parseos, etc.
+Submodule of Jobs endpoint for SynchroteamClient
 """
-import logging
+
 from pathlib import Path
 from typing import Any, Dict, Optional, List
 from datetime import datetime, timezone, timedelta
 
+# uses reports submodule
 from .reports.reports_api import ReportAPI
-from ._downloads import download_job_photos, download_single_photo
-
     
 class JobsAPI:
     def __init__(self, client: "SynchroteamClient", report: "ReportAPI"): # type: ignore
         self.client = client
-        self.report =  ReportAPI(client)
-
+        self.report =  ReportAPI(client) #Usualy a job involves a report 
 
     def check_status_job(self, job_list: List, status: str):
         """
