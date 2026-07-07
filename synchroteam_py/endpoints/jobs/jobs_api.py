@@ -8,11 +8,13 @@ from datetime import datetime, timezone, timedelta
 
 # uses reports submodule
 from .reports.reports_api import ReportAPI
+from ._downloads import download_single_photo, download_job_photos
     
 class JobsAPI:
     def __init__(self, client: "SynchroteamClient", report: "ReportAPI"): # type: ignore
         self.client = client
         self.report =  ReportAPI(client) #Usualy a job involves a report 
+
 
     def check_status_job(self, job_list: List, status: str):
         """
@@ -34,13 +36,12 @@ class JobsAPI:
         """ Get the types of jobs defined in Synchroteam. """
         endpoint = f"/jobtype/list"        
         return self.client._request("GET", endpoint)
-
     
+
     def get_jobs(self, params: Optional[Dict] = None) -> List[Dict]:
         """ Get jobs based on custom parameters """
         endpoint = "/job/list"
         return self.client._request("GET", endpoint, params=params)
-    
 
     def get_all_jobs(self, extra_params: Optional[Dict]) -> List[Dict]:
         """ Get jobs based on custom parameters using multithreading """       
@@ -65,8 +66,8 @@ class JobsAPI:
             raise ValueError("Must provide a id, num or myId")
         
         return self.client._request("GET", "/job/details", params=params)
+           
             
-
     def get_jobs_by_time_between(
             self,
             start_time: str, 
@@ -120,6 +121,7 @@ class JobsAPI:
         """ Download a single photo by photo id and folder destination """
         return download_single_photo(photo, folder, name)
 
+
     def download_job_photos(self, job_id, service_id, folder):
         """ Download job photos by job_id, myId and folder """
         photos = self.get_photos(job_id)
@@ -149,15 +151,3 @@ class JobsAPI:
         print(f"Total of modified last hour {len(recent_jobs)}")
 
         return recent_jobs 
-    
-
-    def download_pdfs_from_services(self, job_id: str, service_id: str, folder="desktop"):
-        """ Download pdf by myId to output folder and uses Selenium RPA """
-        output_dir = Path(folder)
-        output_dir.mkdir(parents=True, exist_ok=True)
-        try:
-            download_job_pdf(job_id=job_id, service_id=service_id, folder=folder)
-            return True
-        except Exception as e:
-            print(f"Error: {e}")
-            return False
