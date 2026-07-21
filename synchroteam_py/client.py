@@ -22,6 +22,9 @@ from .endpoints.equipment import EquipmentAPI
 from .endpoints.customers_api import CustomersAPI
 
 class SynchroteamClient:
+    """
+    Client for synchroteam API
+    """
     def __init__(self):
         auth_string = f"{DOMAIN}:{API_KEY}"
         encoded_auth_string = base64.b64encode(auth_string.encode("utf-8")).decode("utf-8")

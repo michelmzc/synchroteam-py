@@ -151,3 +151,22 @@ class JobsAPI:
         print(f"Total of modified last hour {len(recent_jobs)}")
 
         return recent_jobs 
+    
+    def delete_job(self, id: Optional[str] = None, num: Optional[int] = None, myId: Optional[str] = None) -> Any:
+
+        params = {}
+
+        if id is not None:
+            params["id"] = id
+        elif num is not None:
+            params["num"] = num
+        elif myId is not None:
+            params["myId"] = myId
+        else:
+            raise ValueError("Must provide a id, num or myId")
+        
+        endpoint = f"/job/delete"
+
+        response = self.client._request(method="DELETE", endpoint=endpoint, params=params) 
+
+        return response
