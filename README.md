@@ -6,6 +6,10 @@ This proyect is a wrapper for Synchroteam API V3.
 Clone the repository and create virtual env:
 
 ```bash
+git clone https://github.com/michelmzc/synchroteam-py.git
+
+cd synchroteam-py
+
 python -m venv venv
 ```
 
