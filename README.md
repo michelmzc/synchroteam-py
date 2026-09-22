@@ -11,9 +11,16 @@ python -m venv venv
 
 Activate virtual env (Windows OS example):
 
+Change execution policy:
 ```bash
-(Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& c:\Users\User\Desktop\synchroteam-py\venv\Scripts\Activate.ps1)
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 ```
+
+Activate virtual env:
+```bash
+venv\Scripts\Activate.ps1
+```
+
 
 Then install dependencies:
 
