@@ -29,7 +29,7 @@ class SynchroteamClient:
         auth_string = f"{DOMAIN}:{API_KEY}"
         encoded_auth_string = base64.b64encode(auth_string.encode("utf-8")).decode("utf-8")
 
-        self.base_url = API_URL
+        self.base_url = f"https://{DOMAIN}.synchroteam.com/Api/v3" 
         self.web_url = WEB_URL
         self.user = USER
         self.password = PASSWORD

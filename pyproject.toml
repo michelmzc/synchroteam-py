@@ -13,6 +13,9 @@ readme = "README.md"
 dependencies = [
     "requests",
     "tqdm",
+    "python-dateutil",
+    "dotenv",
+    
 ]
 
 [tool.setuptools.packages.find]
