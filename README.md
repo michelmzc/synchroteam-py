@@ -3,24 +3,33 @@
 This proyect is a wrapper for Synchroteam API V3.
 ## Setup
 
-Clone the repository and then:
+Clone the repository and create virtual env:
+
+```bash
+python -m venv venv
+```
+
+Then install dependencies:
 
 ```bash
 pip install -e .
 ```
 
-Python >=3.8 y pip updated are required.
+Python >=3.8 and pip updated are required.
 
-## Enviroment variables and optional .env file
+
+
+## Create .env file
 ```bash
 SYNCHROTEAM_DOMAIN=
 SYNCHROTEAM_API_KEY=
+
 SYNCHROTEAM_USER=
 SYNCHROTEAM_PASSWORD=
 SYNCHROTEAM_WEB_URL=
 ```
 
-Synchroteam user, password and web_url are used for download Jobs PDFs and are optional.
+Synchroteam user, password and web_url are used for download Jobs PDFs RPA and are optional.
 
 
 ## Example of use
