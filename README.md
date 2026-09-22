@@ -9,6 +9,12 @@ Clone the repository and create virtual env:
 python -m venv venv
 ```
 
+Activate virtual env (Windows OS example):
+
+```bash
+(Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& c:\Users\User\Desktop\synchroteam-py\venv\Scripts\Activate.ps1)
+```
+
 Then install dependencies:
 
 ```bash
@@ -32,7 +38,7 @@ SYNCHROTEAM_WEB_URL=
 Synchroteam user, password and web_url are used for download Jobs PDFs RPA and are optional.
 
 
-## Example of use
+## Run example.py
 
 ```python
 # First configure you enviroment variables or .env file and activate
@@ -53,4 +59,8 @@ jobs_types = client.jobs.get_job_types()
 
 print(jobs_types)
 
+```
+
+```bash
+python example.py
 ```
