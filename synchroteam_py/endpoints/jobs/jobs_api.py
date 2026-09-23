@@ -99,13 +99,13 @@ class JobsAPI:
         return targeted_photos
         
 
-    def get_photos(self, job_id: str = "", num: str="", target_photos: List[str] = []) -> Any:
+    def get_photos(self, job_id: str = "", job_num: str="", target_photos: List[str] = []) -> Any:
         """ Get photos from a job by id """
         endpoint = f"/job/photos"        
         if job_id:
             params = {"id":job_id}
-        elif num:
-            params = {"num":num}
+        elif job_num:
+            params = {"num":job_num}
         else:
             return "Must provide Job ID or num"
         photos = self.client._request("GET", endpoint, params=params)
@@ -122,10 +122,10 @@ class JobsAPI:
         return download_single_photo(photo, folder, name)
 
 
-    def download_job_photos(self, job_id, service_id, folder):
+    def download_job_photos(self, job_id="", job_num="",folder_route=""):
         """ Download job photos by job_id, myId and folder """
-        photos = self.get_photos(job_id)
-        return download_job_photos(photos, service_id, folder)
+        photos = self.get_photos(job_id=job_id, job_num=job_num)
+        return download_job_photos(photos=photos, folder_route=folder_route,max_workers=5)
 
 
     def get_jobs_by_last_hour_modified(self, jobs: List) -> List:
