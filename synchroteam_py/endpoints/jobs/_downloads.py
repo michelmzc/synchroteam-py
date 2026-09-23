@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, Optional
 from concurrent.futures import ThreadPoolExecutor
 
-def download_single_photo(photo: Dict, folder: str, name: str) -> bool:
+def download_single_photo(photo: Dict, folder: str, name: Optional[str]="") -> bool:
     """ Download a single photo """
 
     url = photo.get("url")
