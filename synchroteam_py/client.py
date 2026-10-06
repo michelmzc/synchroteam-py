@@ -30,7 +30,6 @@ class SynchroteamClient:
         encoded_auth_string = base64.b64encode(auth_string.encode("utf-8")).decode("utf-8")
 
         self.base_url = f"https://{DOMAIN}.synchroteam.com/Api/v3" 
-        self.cookies_file = "session.cookies"
     
         self.headers = {
             "Authorization":f"Basic {encoded_auth_string}",
@@ -42,6 +41,8 @@ class SynchroteamClient:
         # creamos sesión que guardara cookies
         self.session = requests.Session()
         self.session.headers.update(self.headers)
+
+        self.timeout = 30
 
         # Instancia de submódulos
         self.reports = ReportAPI(self)
@@ -57,34 +58,37 @@ class SynchroteamClient:
                 self, 
                 method:   str, 
                 endpoint: str, 
-                headers:  Optional[Dict] = None,
-                data:     Optional[Dict] = None, 
-                params:   Optional[Dict] = None,
-                debug_headers: Optional[bool] = False
+                headers:  Optional[Dict[str, str]] = None,
+                data:     Optional[Dict[str, Any]] = None, 
+                params:   Optional[Dict[str, Any]] = None,
+                debug_headers: bool = False
         ) -> Any:
         
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
 
         logger.debug("[%s] Request to %s", method.upper(), url)
-        
+
+        request_headers = self.headers.copy()
+
         if headers:
-            self.headers.update(headers)
+            request_headers.update(headers)
             
         start_time = perf_counter()
 
         response = self.session.request(
             method = method.upper(),
             url = url,
-            headers = self.headers, 
+            headers = request_headers, 
             json = data, 
-            params = params
+            params = params,
+            timeout=self.timeout
         )
 
         # miliseconds
         duration_ms = (perf_counter() - start_time) * 1000 
 
         logger.debug(
-            "[%s] %s -> %s (%.2fs)", 
+            "[%s] %s -> %s (%.2fms)", 
             method.upper(),
             url,
             response.status_code,
@@ -104,12 +108,15 @@ class SynchroteamClient:
     
         # http headers
         #  daily quota remaining
-        quota_remainig = response.headers.get("X-Quota-Remaining")
+        quota_remaining = response.headers.get("X-Quota-Remaining")
+        
+        if quota_remaining is not None:
+            quota_remaining = int(quota_remaining)
 
-        if quota_remainig:
-            logger.debug("Remaining quota: %s", quota_remainig)
-            if quota_remainig < 5000:
-                logger.warning("Low Synchroteam quota remaining: %s", quota_remainig)
+            logger.debug("Remaining quota: %s", quota_remaining)
+
+            if quota_remaining < 5000:
+                logger.warning("Low Synchroteam quota remaining: %s", quota_remaining)
         
         #  all headers
         if debug_headers:
@@ -151,7 +158,7 @@ class SynchroteamClient:
             "pageSize": page_size
         })
 
-        response = self.session.get(url, headers=headers, params=initial_params, timeout=30)
+        response = self.session.get(url, headers=headers, params=initial_params, timeout=self.timeout)
         response.raise_for_status()
         data = response.json()
 
@@ -160,7 +167,7 @@ class SynchroteamClient:
 
 
         logger.info(
-            "Total records: %s from %s page. Route: %s Params: %s",
+            "Total records: %s from %s pages. Route: %s Params: %s",
             total_records,
             total_pages,
             url,
@@ -172,7 +179,7 @@ class SynchroteamClient:
         def fetch_page(page: int):
             params = extra_params.copy()
             params.update({"page": page, "pageSize": page_size})
-            response = self.session.get(url, headers=headers, params=params, timeout=30)
+            response = self.session.get(url, headers=headers, params=params, timeout=self.timeout)
             response.raise_for_status()
 
             return response.json().get("data", [])
