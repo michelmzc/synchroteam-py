@@ -40,13 +40,9 @@ Python >=3.8 and pip updated are required.
 ```bash
 SYNCHROTEAM_DOMAIN=
 SYNCHROTEAM_API_KEY=
-
-SYNCHROTEAM_USER=
-SYNCHROTEAM_PASSWORD=
-SYNCHROTEAM_WEB_URL=
 ```
 
-Synchroteam user, password and web_url are used for download Jobs PDFs RPA and are optional.
+Example domain: domain.synchroteam.com
 
 
 ## Run example.py

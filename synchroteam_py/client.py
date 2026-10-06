@@ -2,21 +2,17 @@
 client.py solo maneja requests (GET, POST, ...) y respuestas
 """
 
-import requests
 import base64
 import logging
+import requests
 
 from time import perf_counter
-from typing import Dict, Optional, Any
-from pathlib import Path
 from math import ceil
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
-from typing import Optional, Dict, List
-from datetime import timezone
-from dateutil.parser import parse 
+from typing import Optional, Dict, List, Any
 
-from .config import DOMAIN, API_URL, API_KEY, USER, PASSWORD, WEB_URL
+from .config import DOMAIN, API_KEY
 from .endpoints.jobs.jobs_api import JobsAPI
 from .endpoints.jobs.reports.reports_api import ReportAPI
 from .endpoints.users import UsersAPI
@@ -34,11 +30,7 @@ class SynchroteamClient:
         encoded_auth_string = base64.b64encode(auth_string.encode("utf-8")).decode("utf-8")
 
         self.base_url = f"https://{DOMAIN}.synchroteam.com/Api/v3" 
-        self.web_url = WEB_URL
-        self.user = USER
-        self.password = PASSWORD
         self.cookies_file = "session.cookies"
-        self.route = Path.cwd()
     
         self.headers = {
             "Authorization":f"Basic {encoded_auth_string}",
@@ -102,7 +94,7 @@ class SynchroteamClient:
         try:
             response.raise_for_status()
         except requests.HTTPError:
-            logger.error(
+            logger.exception(
                 "[%s] %s failed -> %s",
                 method.upper(),
                 endpoint,
@@ -148,7 +140,8 @@ class SynchroteamClient:
                 list: Lista combinada con todos los registros filtrados
         """
 
-        start_time = time.time()
+        start_time = perf_counter()
+
         if extra_params is None:
             extra_params = {}
         
@@ -158,25 +151,36 @@ class SynchroteamClient:
             "pageSize": page_size
         })
 
-        response = requests.get(url, headers=headers, params=initial_params)
+        response = self.session.get(url, headers=headers, params=initial_params, timeout=30)
         response.raise_for_status()
         data = response.json()
 
         total_records = int(data.get("recordsTotal", 0))
         total_pages = ceil(total_records / page_size)
-        
-        print(f"Total records: { total_records } from { total_pages } pages per route: { url } and params: {initial_params}")
+
+
+        logger.info(
+            "Total records: %s from %s page. Route: %s Params: %s",
+            total_records,
+            total_pages,
+            url,
+            initial_params
+        )        
 
         records = data.get("data", [])
 
         def fetch_page(page: int):
             params = extra_params.copy()
             params.update({"page": page, "pageSize": page_size})
-            response = requests.get(url, headers=headers, params=params)
+            response = self.session.get(url, headers=headers, params=params, timeout=30)
             response.raise_for_status()
+
             return response.json().get("data", [])
         
         # descargar en paralelo desde la página 2 hasta la última
+        if total_pages <= 1:
+            return records
+        
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = [
                 executor.submit(fetch_page, page) 
@@ -185,29 +189,20 @@ class SynchroteamClient:
             for future in tqdm(as_completed(futures), total=len(futures), desc="Downloading records"):
                 try: 
                     records.extend(future.result())
-                except Exception as e:
-                    print(f"Error fetching page: {e}")
+                except Exception:
+                    logger.exception("Error fetching page")
 
         
-        end_time = time.time()
-        print(f"Records downloading completed in {end_time - start_time:.2f} seconds. "
-            f"Total records: {len(records)}")
+        elapsed_time = perf_counter() - start_time
+
+        logger.info(
+            "Records downloading completed in %.2f seconds. Total records: %s",
+            elapsed_time,
+            len(records)
+        )
         
         return records
     
-    # función que agrega timezone a un date string
-    @staticmethod
-    def parse_utc(dt_str):
-        if not dt_str:
-            return None 
-        try:
-            dt = parse(dt_str)
-            if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=timezone.utc)
-            return dt 
-        except Exception as e:
-            print(f"Error parsing: {dt_str} -> {e}")
-            return None
 
     def test_connection(self) -> Any:
         """
