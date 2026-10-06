@@ -1,10 +1,12 @@
 """
 client.py solo maneja requests (GET, POST, ...) y respuestas
 """
-import time
+
 import requests
 import base64
+import logging
 
+from time import perf_counter
 from typing import Dict, Optional, Any
 from pathlib import Path
 from math import ceil
@@ -21,6 +23,8 @@ from .endpoints.users import UsersAPI
 from .endpoints.equipment import EquipmentAPI
 from .endpoints.customers_api import CustomersAPI
 
+logger = logging.getLogger(__name__)
+
 class SynchroteamClient:
     """
     Client for synchroteam API
@@ -35,8 +39,6 @@ class SynchroteamClient:
         self.password = PASSWORD
         self.cookies_file = "session.cookies"
         self.route = Path.cwd()
-        #print(f"route: {self.route}")
-        #print(f"Type: {type(self.route)}")
     
         self.headers = {
             "Authorization":f"Basic {encoded_auth_string}",
@@ -59,21 +61,24 @@ class SynchroteamClient:
         
     # función núcleo de peticiones HTTP
     # puede que sea necesario agregar método de modificacón de las cabezera
-    def _request(self, 
-                 method:   str, 
-                 endpoint: str, 
-                 headers:  Optional[Dict] = None,
-                 data:     Optional[Dict] = None, 
-                 params:   Optional[Dict] = None,
+    def _request(
+                self, 
+                method:   str, 
+                endpoint: str, 
+                headers:  Optional[Dict] = None,
+                data:     Optional[Dict] = None, 
+                params:   Optional[Dict] = None,
+                debug_headers: Optional[bool] = False
         ) -> Any:
         
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
-        print(f"[{method.upper()}] request to: {url}")
+
+        logger.debug("[%s] Request to %s", method.upper(), url)
         
         if headers:
             self.headers.update(headers)
             
-        start_time = time.time()
+        start_time = perf_counter()
 
         response = self.session.request(
             method = method.upper(),
@@ -83,26 +88,43 @@ class SynchroteamClient:
             params = params
         )
 
-        duration = time.time() - start_time
-        #print(f"Request compeleted in {duration:.2f} seconds")
+        # miliseconds
+        duration_ms = (perf_counter() - start_time) * 1000 
 
-        # lanza excepción si la respuesta fue mala (4xx o 5xx)
+        logger.debug(
+            "[%s] %s -> %s (%.2fs)", 
+            method.upper(),
+            url,
+            response.status_code,
+            duration_ms
+        )
+        
         try:
             response.raise_for_status()
-        except requests.HTTPError as e:
-            print("HTTP Error:", e)
-            print("Response Text:", response.text)
+        except requests.HTTPError:
+            logger.error(
+                "[%s] %s failed -> %s",
+                method.upper(),
+                endpoint,
+                response.status_code
+            )
             raise
     
-        # revisamos headers 
+        # http headers
+        #  daily quota remaining
+        quota_remainig = response.headers.get("X-Quota-Remaining")
+
+        if quota_remainig:
+            logger.debug("Remaining quota: %s", quota_remainig)
+            if quota_remainig < 5000:
+                logger.warning("Low Synchroteam quota remaining: %s", quota_remainig)
         
-        #print("Response Headers:")
-        for key, value in response.headers.items():
-            if key == "X-Quota-Remaining":
-                print(f"{key}:{value}")
-            #print(keyvalue)
+        #  all headers
+        if debug_headers:
+            logger.debug("Response headers: %s", dict(response.headers))
         
         return response.json()
+    
     # función para obtener todos los registros de una consulta desde su paginación
     def get_all_records(self, 
             url: str, 
