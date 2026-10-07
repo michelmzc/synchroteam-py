@@ -9,30 +9,40 @@ class ReportAPI:
         self.client = client
 
 
-    def get_job_report(self, id: Optional[str]=None, num:Optional[str]=None, myId: Optional[str]=None):
+    def get_job_report(
+            self, 
+            id: Optional[str] = None, 
+            num: Optional[str] = None, 
+            my_id: Optional[str] = None
+        ):
         """ Get job report by id, num or myId """ 
-        endpoint = f"/jobReport/details"        
-
+        
+        endpoint = "/jobReport/details"        
         params = {}
         
         if id is not None:
             params["id"] = id
         elif num is not None:
             params["num"] = num
-        elif myId is not None:
-            params["myId"] = myId
+        elif my_id is not None:
+            params["myId"] = my_id
         else:
             raise ValueError("Must provide a id, num or myId")
+        
         try:
             job_report = self.client._request("GET", endpoint, params=params)        
             return job_report
+        
         except requests.exceptions.HTTPError as error:
-            if error.response.status_code == 404:
-                print(f"Report not found for job")
-                return None
+            if error.response is not None:
+                if error.response.status_code == 404:
+                    print("Report not found for job")
+                    return None
+                else:
+                    print(f"Error HTTP {error.response.status_code}: {error}")
+                    return None
             else:
-                print(f"Error HTTP {error.response.status_code}: {error}")
-                return None
+                print(f"HTTP error without response: {error}")
         except Exception as error:
             print(f"Error getting the report: {error}")
             return None

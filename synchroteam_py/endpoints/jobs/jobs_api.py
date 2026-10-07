@@ -34,7 +34,7 @@ class JobsAPI:
 
     def get_job_types(self):
         """ Get the types of jobs defined in Synchroteam. """
-        endpoint = f"/jobtype/list"        
+        endpoint = "/jobtype/list"        
         return self.client._request("GET", endpoint)
     
 
@@ -52,7 +52,7 @@ class JobsAPI:
         )
 
 
-    def get_job_by_id(self, id: Optional[str] = None, num: Optional[int] = None, myId: Optional[str] = None) -> Any:
+    def get_job_by_id(self, id: Optional[str] = None, num: Optional[int] = None, my_id: Optional[str] = None) -> Any:
         """ Get a job by id, num or myId """
         params = {}
         
@@ -60,8 +60,8 @@ class JobsAPI:
             params["id"] = id
         elif num is not None:
             params["num"] = num
-        elif myId is not None:
-            params["myId"] = myId
+        elif my_id is not None:
+            params["myId"] = my_id
         else:
             raise ValueError("Must provide a id, num or myId")
         
@@ -101,7 +101,7 @@ class JobsAPI:
 
     def get_photos(self, job_id: str = "", job_num: str="", target_photos: List[str] = []) -> Any:
         """ Get photos from a job by id """
-        endpoint = f"/job/photos"        
+        endpoint = "/job/photos"        
         if job_id:
             params = {"id":job_id}
         elif job_num:
@@ -122,7 +122,7 @@ class JobsAPI:
         return download_single_photo(photo, folder, name)
 
 
-    def download_job_photos(self, job_id="", job_num="",folder_route=""):
+    def download_job_photos(self, job_id, job_num, folder_route: str):
         """ Download job photos by job_id, myId and folder """
         photos = self.get_photos(job_id=job_id, job_num=job_num)
         return download_job_photos(photos=photos, folder_route=folder_route,max_workers=5)
@@ -152,7 +152,7 @@ class JobsAPI:
 
         return recent_jobs 
     
-    def delete_job(self, id: Optional[str] = None, num: Optional[int] = None, myId: Optional[str] = None) -> Any:
+    def delete_job(self, id: Optional[str] = None, num: Optional[int] = None, my_id: Optional[str] = None) -> Any:
 
         params = {}
 
@@ -160,12 +160,12 @@ class JobsAPI:
             params["id"] = id
         elif num is not None:
             params["num"] = num
-        elif myId is not None:
-            params["myId"] = myId
+        elif my_id is not None:
+            params["myId"] = my_id
         else:
             raise ValueError("Must provide a id, num or myId")
         
-        endpoint = f"/job/delete"
+        endpoint = "/job/delete"
 
         response = self.client._request(method="DELETE", endpoint=endpoint, params=params) 
 

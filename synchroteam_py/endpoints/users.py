@@ -13,7 +13,7 @@ class UsersAPI:
 
         return self.client.get_all_records(url=f"{self.client.base_url}{endpoint}", headers=self.client.headers) 
 
-    def get_user_by_id(self, user_id: str = ""):
+    def get_user_by_id(self, user_id: str):
         """ Get a user by id """
         if (user_id != ""):
             endpoint = "/user/details"
@@ -22,5 +22,5 @@ class UsersAPI:
             }
             return self.client._request("GET", endpoint, params=params)
         else:
-            None
+            return None
             
