@@ -9,7 +9,6 @@ import requests
 from time import perf_counter
 from math import ceil
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from tqdm import tqdm
 from typing import Optional, Dict, List, Any
 
 from .config import DOMAIN, API_KEY
@@ -179,10 +178,18 @@ class SynchroteamClient:
         def fetch_page(page: int):
             params = extra_params.copy()
             params.update({"page": page, "pageSize": page_size})
+            
+            logger.debug("Fetching page %s/%s", page, total_pages)
+            
             response = self.session.get(url, headers=headers, params=params, timeout=self.timeout)
             response.raise_for_status()
 
-            return response.json().get("data", [])
+            data = response.json()
+            records = data.get("data", [])
+
+            logger.debug("Page %s/%s fetched successfully: %s records", page, total_pages, len(records))
+            
+            return records
         
         # descargar en paralelo desde la página 2 hasta la última
         if total_pages <= 1:
@@ -193,11 +200,12 @@ class SynchroteamClient:
                 executor.submit(fetch_page, page) 
                 for page in range(2, total_pages + 1)
             ]
-            for future in tqdm(as_completed(futures), total=len(futures), desc="Downloading records"):
+            for future in as_completed(futures):
                 try: 
                     records.extend(future.result())
                 except Exception:
                     logger.exception("Error fetching page")
+                    raise
 
         
         elapsed_time = perf_counter() - start_time
