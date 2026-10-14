@@ -6,5 +6,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DOMAIN = os.getenv("SYNCHROTEAM_DOMAIN")
-API_KEY = os.getenv("SYNCHROTEAM_API_KEY")
+try:
+    DOMAIN = os.getenv("SYNCHROTEAM_DOMAIN")
+except Exception as e:
+    DOMAIN = None
+
+try: 
+    API_KEY = os.getenv("SYNCHROTEAM_API_KEY")
+except Exception as e:
+    API_KEY = None
