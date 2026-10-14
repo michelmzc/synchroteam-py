@@ -6,10 +6,19 @@ from pathlib import Path
 from typing import Dict, Optional
 from concurrent.futures import ThreadPoolExecutor
 
-def download_single_photo(photo: Dict, folder: str, name: Optional[str]="") -> bool:
-    """ Download a single photo """
+def download_single_photo(
+        photo: Dict, 
+        folder: str | Path, 
+        name: Optional[str] = ""
+    ) -> bool:
 
+    """ Download a single photo """ 
+    
     url = photo.get("url")
+    if not url:
+        print("Error: photo does not containt a valid URL")
+        return False
+
     comment = photo.get("comment", "").strip()
 
     if name:
@@ -23,8 +32,8 @@ def download_single_photo(photo: Dict, folder: str, name: Optional[str]="") -> b
         c for c in filename if c.isalnum() or c in (" ", ".", "_")
     ).rstrip()
 
-    folder = Path(folder)
-    file_path = folder / safe_filename
+    folder_path = Path(folder)
+    file_path = folder_path / safe_filename
 
     try:
         content = requests.get(url).content
@@ -38,7 +47,7 @@ def download_single_photo(photo: Dict, folder: str, name: Optional[str]="") -> b
     
 def download_job_photos(
     photos: Dict,
-    folder_route: Path,
+    folder_route: str,
     target: Optional[str] = None,
     max_workers: Optional[int] = 5
 ) -> str:

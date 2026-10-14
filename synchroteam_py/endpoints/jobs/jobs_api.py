@@ -1,14 +1,15 @@
 """
 Submodule of Jobs endpoint for SynchroteamClient
 """
-
-from pathlib import Path
+import logging
 from typing import Any, Dict, Optional, List
 from datetime import datetime, timezone, timedelta
 
 # uses reports submodule
 from .reports.reports_api import ReportAPI
 from ._downloads import download_single_photo, download_job_photos
+
+logger = logging.getLogger(__name__)
     
 class JobsAPI:
     def __init__(self, client: "SynchroteamClient", report: "ReportAPI"): # type: ignore
@@ -34,7 +35,7 @@ class JobsAPI:
 
     def get_job_types(self):
         """ Get the types of jobs defined in Synchroteam. """
-        endpoint = f"/jobtype/list"        
+        endpoint = "/jobtype/list"        
         return self.client._request("GET", endpoint)
     
 
@@ -52,7 +53,7 @@ class JobsAPI:
         )
 
 
-    def get_job_by_id(self, id: Optional[str] = None, num: Optional[int] = None, myId: Optional[str] = None) -> Any:
+    def get_job_by_id(self, id: Optional[str] = None, num: Optional[int] = None, my_id: Optional[str] = None) -> Any:
         """ Get a job by id, num or myId """
         params = {}
         
@@ -60,8 +61,8 @@ class JobsAPI:
             params["id"] = id
         elif num is not None:
             params["num"] = num
-        elif myId is not None:
-            params["myId"] = myId
+        elif my_id is not None:
+            params["myId"] = my_id
         else:
             raise ValueError("Must provide a id, num or myId")
         
@@ -101,7 +102,7 @@ class JobsAPI:
 
     def get_photos(self, job_id: str = "", job_num: str="", target_photos: List[str] = []) -> Any:
         """ Get photos from a job by id """
-        endpoint = f"/job/photos"        
+        endpoint = "/job/photos"        
         if job_id:
             params = {"id":job_id}
         elif job_num:
@@ -122,7 +123,7 @@ class JobsAPI:
         return download_single_photo(photo, folder, name)
 
 
-    def download_job_photos(self, job_id="", job_num="",folder_route=""):
+    def download_job_photos(self, job_id, job_num, folder_route: str):
         """ Download job photos by job_id, myId and folder """
         photos = self.get_photos(job_id=job_id, job_num=job_num)
         return download_job_photos(photos=photos, folder_route=folder_route,max_workers=5)
@@ -135,24 +136,30 @@ class JobsAPI:
         # get actual time
         now = datetime.now(timezone.utc)
         one_hour_ago = now - timedelta(hours=1)
-        print(f"One hour ago was: { one_hour_ago} and now is { now }  ")
+
+        logger.debug("Filtering jobs modified between %s and %s", one_hour_ago, now)
             
         recent_jobs = []
         for job in jobs:
-            modified_dt = self.client.parse_utc(job["dateModified"])
+            date_modified = job.get("dateModified")
+            if not date_modified:
+                logger.warning("Job without dateModified field")
+                continue
+
+            modified_dt = self.client.parse_utc(date_modified)
                 
             if modified_dt and one_hour_ago <= modified_dt <= now:
-                print(f"One hour ago was {one_hour_ago} and modified job was {modified_dt} and now is { now }")
+                logger.debug("Job modified within last hour: modified=%s", modified_dt)
                 recent_jobs.append(job)
             
         # order by last time modified descendent (most recent first)
         recent_jobs.sort(key=lambda j: datetime.fromisoformat(j["dateModified"].rstrip('Z')), reverse=True)
 
-        print(f"Total of modified last hour {len(recent_jobs)}")
+        logger.info("Found %d jobs modified within the last hour", len(recent_jobs))
 
         return recent_jobs 
     
-    def delete_job(self, id: Optional[str] = None, num: Optional[int] = None, myId: Optional[str] = None) -> Any:
+    def delete_job(self, id: Optional[str] = None, num: Optional[int] = None, my_id: Optional[str] = None) -> Any:
 
         params = {}
 
@@ -160,12 +167,12 @@ class JobsAPI:
             params["id"] = id
         elif num is not None:
             params["num"] = num
-        elif myId is not None:
-            params["myId"] = myId
+        elif my_id is not None:
+            params["myId"] = my_id
         else:
             raise ValueError("Must provide a id, num or myId")
         
-        endpoint = f"/job/delete"
+        endpoint = "/job/delete"
 
         response = self.client._request(method="DELETE", endpoint=endpoint, params=params) 
 
