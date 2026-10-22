@@ -159,7 +159,7 @@ class JobsAPI:
 
         return recent_jobs 
     
-    def delete_job(self, id: Optional[str] = None, num: Optional[int] = None, my_id: Optional[str] = None) -> Any:
+    def delete(self, id: Optional[str] = None, num: Optional[int] = None, my_id: Optional[str] = None) -> Any:
 
         params = {}
 
@@ -175,5 +175,32 @@ class JobsAPI:
         endpoint = "/job/delete"
 
         response = self.client._request(method="DELETE", endpoint=endpoint, params=params) 
+
+        return response
+
+    def update(
+            self, 
+            id: Optional[str] = None,
+            num: Optional[int] = None,
+            my_id: Optional[str] = None,
+            data: Optional[Dict] = None 
+        ) -> Any:
+
+        params = {}
+
+        if id is not None:
+            params["id"] = id
+        elif num is not None:
+            params["num"] = num
+        elif my_id is not None:
+            params["myId"] = my_id
+        else:
+            raise ValueError("Must provide a id, num or myId")
+
+        if not data:
+            raise ValueError("Must provide update data")
+            
+        endpoint = "/job/send"
+        response = self.client._request(method="POST", endpoint=endpoint, params=params, data=data)
 
         return response
