@@ -7,11 +7,14 @@ from datetime import datetime, timezone, timedelta
 
 # uses reports submodule
 from .reports.reports_api import ReportAPI
+from ..base_api import BaseAPI
 from ._downloads import download_single_photo, download_job_photos
 
 logger = logging.getLogger(__name__)
     
-class JobsAPI:
+class JobsAPI(BaseAPI):
+    MISSING_IDENTIFIER = "Must provide a id, num or my_id for a valid Job"
+
     def __init__(self, client: "SynchroteamClient", report: "ReportAPI"): # type: ignore
         self.client = client
         self.report =  ReportAPI(client) #Usualy a job involves a report 
@@ -55,16 +58,7 @@ class JobsAPI:
 
     def get_job_by_id(self, id: Optional[str] = None, num: Optional[int] = None, my_id: Optional[str] = None) -> Any:
         """ Get a job by id, num or myId """
-        params = {}
-        
-        if id is not None:
-            params["id"] = id
-        elif num is not None:
-            params["num"] = num
-        elif my_id is not None:
-            params["myId"] = my_id
-        else:
-            raise ValueError("Must provide a id, num or myId")
+        params = self._get_identifier_params(identifier_error=self.MISSING_IDENTIFIER, id=id, num=num, my_id=my_id)
         
         return self.client._request("GET", "/job/details", params=params)
            
@@ -100,15 +94,10 @@ class JobsAPI:
         return targeted_photos
         
 
-    def get_photos(self, job_id: str = "", job_num: str="", target_photos: List[str] = []) -> Any:
+    def get_photos(self, id: Optional[str] = None, num: Optional[int] = None, my_id: Optional[str] = None, target_photos: List[str] = []) -> Any:
         """ Get photos from a job by id """
         endpoint = "/job/photos"        
-        if job_id:
-            params = {"id":job_id}
-        elif job_num:
-            params = {"num":job_num}
-        else:
-            return "Must provide Job ID or num"
+        params = self._get_identifier_params(identifier_error=self.MISSING_IDENTIFIER, id=id, num=num, my_id=my_id)
         photos = self.client._request("GET", endpoint, params=params)
 
         if target_photos:
@@ -123,9 +112,9 @@ class JobsAPI:
         return download_single_photo(photo, folder, name)
 
 
-    def download_job_photos(self, job_id, job_num, folder_route: str):
+    def download_job_photos(self, id, num, folder_route: str):
         """ Download job photos by job_id, myId and folder """
-        photos = self.get_photos(job_id=job_id, job_num=job_num)
+        photos = self.get_photos(id=id, num=num)
         return download_job_photos(photos=photos, folder_route=folder_route,max_workers=5)
 
 
@@ -161,19 +150,10 @@ class JobsAPI:
     
     def delete_job(self, id: Optional[str] = None, num: Optional[int] = None, my_id: Optional[str] = None) -> Any:
 
-        params = {}
-
-        if id is not None:
-            params["id"] = id
-        elif num is not None:
-            params["num"] = num
-        elif my_id is not None:
-            params["myId"] = my_id
-        else:
-            raise ValueError("Must provide a id, num or myId")
+        params = self._get_identifier_params(identifier_error=self.MISSING_IDENTIFIER, id=id, num=num, my_id=my_id)
         
         endpoint = "/job/delete"
 
-        response = self.client._request(method="DELETE", endpoint=endpoint, params=params) 
+        return self.client._request(method="DELETE", endpoint=endpoint, params=params) 
 
-        return response
+        
