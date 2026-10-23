@@ -148,7 +148,7 @@ class JobsAPI(BaseAPI):
 
         return recent_jobs 
     
-    def delete_job(self, id: Optional[str] = None, num: Optional[int] = None, my_id: Optional[str] = None) -> Any:
+    def delete(self, id: Optional[str] = None, num: Optional[int] = None, my_id: Optional[str] = None) -> Any:
 
         params = self._get_identifier_params(identifier_error=self.MISSING_IDENTIFIER, id=id, num=num, my_id=my_id)
         
