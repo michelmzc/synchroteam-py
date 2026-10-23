@@ -16,8 +16,8 @@ class JobsAPI(BaseAPI):
     MISSING_IDENTIFIER = "Must provide a id, num or my_id for a valid Job"
 
     def __init__(self, client: "SynchroteamClient", report: "ReportAPI"): # type: ignore
-        self.client = client
-        self.report =  ReportAPI(client) #Usualy a job involves a report 
+        super().__init__(client)
+        self.report =  report  #Usualy a job involves a report 
 
 
     def check_status_job(self, job_list: List, status: str):
@@ -80,7 +80,7 @@ class JobsAPI(BaseAPI):
         return jobs  
 
 
-    def target_photo_filter(self, photos: Dict, target_photo: List):
+    def target_photo_filter(self, photos: Dict, target_photo: Optional[List[str]]):
         """ Get a photo by a filter they custom name"""
         targeted_photos = []
 
