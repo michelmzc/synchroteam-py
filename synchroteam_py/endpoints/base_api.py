@@ -1,6 +1,5 @@
 from typing import Any, Optional
 
-
 class BaseAPI:
     def __init__(self, client: Any) -> None:
         self.client = client
@@ -11,7 +10,7 @@ class BaseAPI:
         id: Optional[str] = None,
         num: Optional[int] = None,
         my_id: Optional[str] = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         
         if id is not None:
             return {"id": id}

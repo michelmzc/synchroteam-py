@@ -19,7 +19,7 @@ from typing import Optional, Dict, List, Any, Type
 
 from .config import DOMAIN, API_KEY
 from .endpoints.jobs.jobs_api import JobsAPI
-from .endpoints.jobs.reports.reports_api import ReportAPI
+from .endpoints.jobs.reports_api import ReportAPI
 from .endpoints.users import UsersAPI
 from .endpoints.equipment import EquipmentAPI
 from .endpoints.customers_api import CustomersAPI
@@ -162,7 +162,6 @@ class SynchroteamClient:
         )
 
         # revisión de cuota previa para cubrir error 429
-
         self._check_quota(response)
 
         if debug_headers:
