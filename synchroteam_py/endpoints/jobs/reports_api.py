@@ -5,6 +5,7 @@ from typing import Dict, Optional, Any
 from ..base_api import BaseAPI
 
 logger = logging.getLogger(__name__)
+
 class ReportAPI(BaseAPI):
     MISSING_IDENTIFIER = "Must provide a id, num or my_id for a valid Job"
 

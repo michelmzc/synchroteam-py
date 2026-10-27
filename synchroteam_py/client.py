@@ -26,7 +26,6 @@ from .endpoints.customers_api import CustomersAPI
 
 logger = logging.getLogger(__name__)
 
-
 # constants
 API_PATH = "/Api/v3"
 DEFAULT_TIMEOUT = 30
