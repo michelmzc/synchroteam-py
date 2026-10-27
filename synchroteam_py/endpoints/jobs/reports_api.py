@@ -40,6 +40,7 @@ class ReportAPI(BaseAPI):
                 return None
 
             logger.exception("HTTP error without response getting job report: %s", error)
+            return None
 
         except requests.exceptions.RequestException as error:
             logger.exception("Error getting the job report: %s", error)
