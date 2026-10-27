@@ -21,7 +21,7 @@ from .config import DOMAIN, API_KEY
 from .endpoints.jobs.jobs_api import JobsAPI
 from .endpoints.jobs.reports_api import ReportAPI
 from .endpoints.users import UsersAPI
-from .endpoints.equipment import EquipmentAPI
+from .endpoints.equipment_api import EquipmentAPI
 from .endpoints.customers_api import CustomersAPI
 
 logger = logging.getLogger(__name__)

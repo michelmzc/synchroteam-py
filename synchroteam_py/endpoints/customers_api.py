@@ -1,35 +1,37 @@
-"""
-Clase relacionada a los clientes finales.
-"""
-
 from typing import Optional
 
-class CustomersAPI:
+from .base_api import BaseAPI
+
+class CustomersAPI(BaseAPI):
+    MISSING_IDENTIFIER_ERROR = "At least one of id, my_id or num is required to get a customer"
+
     def __init__(self, client: "SynchroteamClient"): # type: ignore
-        self.client = client
-    
-    def get_customer(self, id: Optional[str]=None, 
-                     my_id: Optional[str]=None, 
-                     num: Optional[str]=None
-                     ):
+        super().__init__(client)
+
+    def get(
+            self, 
+            id: Optional[str]=None,                       
+            num: Optional[int]=None,
+            my_id: Optional[str]=None
+        ):
         """
-            Get a client by Synchroteam id, myId or num.
-            Must be one parameters.
-            Get by:
-                id: internal synchroteam id
-                myId: custom id
-                num: synchroteam number
+            Get a customeer by identifier.
+            
+            Priority order:
+                1. id: internal synchroteam id
+                2. num: synchroteam number
+                3. my_id: custom id
 
+            If more than one identifier is provided, only the
+            highest-priority identifier will be used.
         """
-
-        if not any([id, my_id, num]):
-            raise ValueError("At least one of id, myId or num is required")
-
+        
         endpoint = "/customer/details"
-        params = {}
-
-        if id is not None:   params["id"]   = id
-        if my_id is not None: params["myId"] = my_id
-        if num is not None:  params["num"]  = num
+        params = self._get_identifier_params(
+            identifier_error=self.MISSING_IDENTIFIER_ERROR,
+            id=id,
+            num=num,
+            my_id=my_id
+        )
         
         return self.client._request("GET", endpoint, params=params)
